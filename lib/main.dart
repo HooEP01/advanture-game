@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import './story_brain.dart';
+import './buildMaterialColor.dart';
 
-//TODO: Step 15 - Run the app and see if you can see the screen update with the first story. Delete this TODO if it looks as you expected.
-
-void main() => runApp(AdventureGame());
+void main() => runApp(const AdventureGame());
 
 class AdventureGame extends StatelessWidget {
   const AdventureGame({Key? key}) : super(key: key);
@@ -10,27 +10,55 @@ class AdventureGame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData.dark(), // we are using the dark theme
-      home: StoryPage(),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSwatch(
+          primarySwatch: buildMaterialColor(const Color(0xFFFF6000)),
+        ).copyWith(
+          secondary: buildMaterialColor(const Color(0xFFFFA559)),
+        ),
+        fontFamily: 'Ubuntu',
+        textTheme: ThemeData.light().textTheme.copyWith(
+              bodyMedium: const TextStyle(
+                fontSize: 18,
+                fontFamily: 'Ubuntu',
+                color: Colors.white,
+              ),
+              titleLarge: const TextStyle(
+                fontSize: 25,
+                fontFamily: 'Ubuntu',
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+      ), // we are using the dark theme
+
+      home: const StoryPage(),
     );
   }
 }
 
-//TODO: Step 9 - Create a new storyBrain object from the StoryBrain class.
-
 class StoryPage extends StatefulWidget {
+  const StoryPage({super.key});
   @override
   State<StoryPage> createState() => _StoryPageState();
 }
 
 class _StoryPageState extends State<StoryPage> {
+  // object of StoryBrain
+  var storyBrain = StoryBrain();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        //TODO: Step 1 - Find a background image, add the background image into the images directory, then add the background image to this Container.
-        padding: EdgeInsets.symmetric(vertical: 50.0, horizontal: 15.0),
-        constraints: BoxConstraints.expand(),
+        // image background
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/mountain.jpg'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 50.0, horizontal: 15.0),
+        constraints: const BoxConstraints.expand(),
         child: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -39,11 +67,8 @@ class _StoryPageState extends State<StoryPage> {
                 flex: 12,
                 child: Center(
                   child: Text(
-                    //TODO: Step 10 - use the storyBrain to get the first story title and display it in this Text Widget.
-                    'Story text will go here',
-                    style: TextStyle(
-                      fontSize: 25.0,
-                    ),
+                    storyBrain.getStory,
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
               ),
@@ -52,52 +77,49 @@ class _StoryPageState extends State<StoryPage> {
                 child: TextButton(
                   onPressed: () {
                     // Choice 1 made by user
-                    //TODO: Step 18 - Call the nextStory() method from storyBrain and pass the number 1 as the choice made by the user.
+                    setState(() {
+                      storyBrain.nextStory(1);
+                    });
                   },
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.resolveWith(
-                            (states) => Colors.red),
+                        (states) => Theme.of(context).colorScheme.primary),
                     foregroundColor: MaterialStateProperty.resolveWith(
-                            (states) => Colors.white),
+                        (states) => Colors.white),
                     shape: MaterialStateProperty.resolveWith(
-                            (states) => BeveledRectangleBorder()),
+                        (states) => const BeveledRectangleBorder()),
                   ),
                   child: Text(
-                    //TODO: Step 13 - Use the storyBrain to get the text for choice 1.
-                    'Choice 1',
-                    style: TextStyle(
-                      fontSize: 20.0,
-                    ),
+                    storyBrain.getChoice1,
+                    style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 20.0,
               ),
               Expanded(
                 flex: 2,
                 child: Visibility(
-                  //TODO: Step 26 - Use a Flutter Visibility Widget to wrap this TextButton.
-                  //TODO: Step 28 - Set the "visible" property of the Visibility Widget to equal the output from the buttonShouldBeVisible() method in the storyBrain.
+                  visible: storyBrain.buttonShouldBeVisible(),
                   child: TextButton(
                     onPressed: () {
                       // Choice 2 made by user
-                      //TODO: Step 19 - Call the nextStory() method from storyBrain and pass the number 2 as the choice made by the user.
+                      setState(() {
+                        storyBrain.nextStory(2);
+                      });
                     },
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.resolveWith(
-                              (states) => Colors.blue),
+                          (states) => Theme.of(context).colorScheme.secondary),
                       foregroundColor: MaterialStateProperty.resolveWith(
-                              (states) => Colors.white),
+                          (states) => Colors.white),
                       shape: MaterialStateProperty.resolveWith(
-                              (states) => BeveledRectangleBorder()),
+                          (states) => const BeveledRectangleBorder()),
                     ),
                     child: Text(
-                      //TODO: Step 14 - Use the storyBrain to get the text for choice 2.
-                      'Choice 2',
-                      style: TextStyle(
-                        fontSize: 20.0,
-                      ),
+                      storyBrain.getChoice2,
+                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ),
                 ),
@@ -109,7 +131,3 @@ class _StoryPageState extends State<StoryPage> {
     );
   }
 }
-
-//TODO: Step 24 - Run the app and try to figure out what code you need to add to this file to make the story change when you press on the choice buttons.
-
-//TODO: Step 29 - Run the app and test it against the Story Outline to make sure you've completed all the steps.
